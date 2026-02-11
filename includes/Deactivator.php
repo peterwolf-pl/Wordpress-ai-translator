@@ -8,13 +8,10 @@ final class Deactivator
 {
     public static function deactivate(): void
     {
-        $timestamp = wp_next_scheduled(Plugin::CRON_HOOK);
+        // Czyści wszystkie zaplanowane wystąpienia hooka.
+        wp_clear_scheduled_hook(Plugin::CRON_HOOK);
 
-        if ($timestamp !== false) {
-            wp_unschedule_event($timestamp, Plugin::CRON_HOOK);
-        }
-
-        // Opcjonalnie flush tylko podczas DEAKTYWACJI, nie przy każdym uruchomieniu.
+        // Opcjonalnie flush tylko podczas DEAKTYWACJI.
         flush_rewrite_rules(false);
     }
 }

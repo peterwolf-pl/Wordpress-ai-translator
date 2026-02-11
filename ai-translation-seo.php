@@ -3,11 +3,14 @@
  * Plugin Name: WP-ai-translation-seo
  * Plugin URI:  https://example.com/wp-ai-translation-seo
  * Description: AI translation helper with SEO-oriented storage and scheduling.
- * Version:     1.0.0
+ * Version:     1.0.1
  * Author:      WP AI Translation Team
  * Text Domain: ai-translation-seo
  * Domain Path: /languages
  * Requires PHP: 8.0
+ *
+ * Jeśli docelowa wersja PHP w środowisku jest nieokreślona,
+ * ustaw wymaganie zgodnie z polityką hostingu projektu.
  */
 
 declare(strict_types=1);
@@ -16,7 +19,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-const AI_TRANSLATION_SEO_VERSION = '1.0.0';
+const AI_TRANSLATION_SEO_VERSION = '1.0.1';
 const AI_TRANSLATION_SEO_FILE = __FILE__;
 
 /**
@@ -38,19 +41,8 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
-register_activation_hook(
-    __FILE__,
-    static function (): void {
-        AI_Translation_SEO\Activator::activate();
-    }
-);
-
-register_deactivation_hook(
-    __FILE__,
-    static function (): void {
-        AI_Translation_SEO\Deactivator::deactivate();
-    }
-);
+register_activation_hook(__FILE__, ['AI_Translation_SEO\Activator', 'activate']);
+register_deactivation_hook(__FILE__, ['AI_Translation_SEO\Deactivator', 'deactivate']);
 
 add_action('plugins_loaded', static function (): void {
     $plugin = new AI_Translation_SEO\Plugin();

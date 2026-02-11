@@ -10,9 +10,14 @@ final class Plugin
 {
     public const OPTION_SCHEMA_VERSION = 'ai_translation_seo_schema_version';
     public const OPTION_HARD_DELETE = 'ai_translation_seo_hard_delete';
-    public const SCHEMA_VERSION = '1.0.0';
+    public const OPTION_EN_URL_MODE = 'ai_translation_seo_en_url_mode';
+    public const OPTION_EN_SUBDIRECTORY = 'ai_translation_seo_en_subdirectory';
+    public const SCHEMA_VERSION = '1.0.1';
     public const CRON_HOOK = 'ai_translation_seo_cron_event';
     public const TABLE_SLUG = 'ai_translation_seo_jobs';
+
+    public const EN_MODE_SUBDIRECTORY = 'subdirectory';
+    public const EN_MODE_SUBDOMAIN = 'subdomain';
 
     public function run(): void
     {

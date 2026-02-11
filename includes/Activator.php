@@ -6,13 +6,11 @@ namespace AI_Translation_SEO;
 
 final class Activator
 {
-    public static function activate(): bool
+    public static function activate(): void
     {
         self::installSchema();
         self::setDefaultOptions();
         self::scheduleCron();
-
-        return true;
     }
 
     private static function installSchema(): void
@@ -34,8 +32,8 @@ final class Activator
             seo_title TEXT NULL,
             seo_description TEXT NULL,
             status VARCHAR(20) NOT NULL DEFAULT 'pending',
-            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created_at DATETIME NOT NULL,
+            updated_at DATETIME NOT NULL,
             PRIMARY KEY  (id),
             KEY source_post_id (source_post_id),
             KEY status (status)
@@ -50,6 +48,14 @@ final class Activator
     {
         if (get_option(Plugin::OPTION_HARD_DELETE, null) === null) {
             add_option(Plugin::OPTION_HARD_DELETE, '0');
+        }
+
+        if (get_option(Plugin::OPTION_EN_URL_MODE, null) === null) {
+            add_option(Plugin::OPTION_EN_URL_MODE, Plugin::EN_MODE_SUBDIRECTORY);
+        }
+
+        if (get_option(Plugin::OPTION_EN_SUBDIRECTORY, null) === null) {
+            add_option(Plugin::OPTION_EN_SUBDIRECTORY, 'en');
         }
     }
 

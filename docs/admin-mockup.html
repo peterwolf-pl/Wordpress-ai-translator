@@ -1,16 +1,36 @@
 <!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><title>AI Translation SEO Mockup</title>
-<style>body{font-family:Arial,sans-serif;padding:20px} .tabs span{display:inline-block;padding:8px 12px;border:1px solid #ccc;margin-right:6px;border-bottom:none;background:#f6f7f7}.panel{border:1px solid #ccc;padding:16px;margin-top:-1px} h3{margin-top:20px}</style>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#f0f0f1}
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.sidebar{background:#1d2327;color:#fff;padding:14px}
+.sidebar h3{font-size:14px;margin:0 0 10px}
+.sidebar .item{padding:8px 10px;background:#2271b1;border-radius:4px;margin-bottom:8px}
+.main{padding:20px}
+.tabs span{display:inline-block;padding:8px 12px;border:1px solid #ccc;margin-right:6px;border-bottom:none;background:#f6f7f7}
+.panel{border:1px solid #ccc;padding:16px;margin-top:-1px;background:#fff}
+h3{margin-top:20px}
+</style>
 </head>
 <body>
-<h1>MOCKUP - WP Admin: AI Translation SEO</h1>
-<div class="tabs"><span>General</span><span>Languages</span><span>Providers</span><span>Workflow</span><span>Glossary</span><span>Translation Memory</span><span>Jobs</span><span>SEO</span><span>Logs</span><span>Billing</span></div>
-<div class="panel">
-<h3>General</h3>
-<ul><li>Default source language: pl-PL (readonly)</li><li>Default target language: en-GB|en-US|en</li><li>URL strategy: subdir|subdomain|domain</li><li>Consent to contact external AI services: checkbox + timestamp</li><li>Hard delete on uninstall: checkbox</li></ul>
-<h3>Providers</h3>
-<ul><li>Provider: OpenAI|DeepL|Google|AWS|Azure</li><li>API credentials: masked fields</li><li>Test connection button</li><li>Rate limit mode: conservative|balanced|aggressive</li><li>Batch mode: on/off</li></ul>
-<h3>Workflow</h3>
-<ul><li>Auto-translate on publish: on/off</li><li>Translate on update: on/off</li><li>Always create as draft: on/off</li><li>score_total minimum: 0-100</li><li>glossary violations allowed: 0/1/..</li></ul>
-</div></body></html>
+<div class="layout">
+  <aside class="sidebar">
+    <h3>WP Admin (main menu)</h3>
+    <div class="item">AI Translation SEO</div>
+    <div>Dashboard</div><div>General</div><div>Languages</div><div>Providers</div><div>Workflow</div><div>Glossary</div><div>Translation Memory</div><div>Jobs</div><div>SEO</div><div>Logs</div><div>Billing</div>
+  </aside>
+  <main class="main">
+    <h1>MOCKUP - AI Translation SEO Control Panel</h1>
+    <div class="tabs"><span>Dashboard</span><span>General</span><span>Languages</span><span>Providers</span><span>Workflow</span><span>Glossary</span><span>Translation Memory</span><span>Jobs</span><span>SEO</span><span>Logs</span><span>Billing</span></div>
+    <div class="panel">
+      <h3>General</h3>
+      <ul><li>Default source language: pl-PL (readonly)</li><li>Default target language: en-GB|en-US|en</li><li>URL strategy: subdir|subdomain|domain</li><li>Consent to contact external AI services: checkbox + timestamp</li><li>Hard delete on uninstall: checkbox</li></ul>
+      <h3>Providers</h3>
+      <ul><li>Provider: OpenAI|DeepL|Google|AWS|Azure</li><li>API credentials: masked fields</li><li>Test connection button</li><li>Rate limit mode: conservative|balanced|aggressive</li><li>Batch mode: on/off</li></ul>
+      <h3>Workflow</h3>
+      <ul><li>Auto-translate on publish: on/off</li><li>Translate on update: on/off</li><li>Always create as draft: on/off</li><li>score_total minimum: 0-100</li><li>glossary violations allowed: 0/1/..</li></ul>
+    </div>
+  </main>
+</div>
+</body></html>

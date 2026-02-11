@@ -19,13 +19,41 @@ final class Settings_Page
 
     public function addMenu(): void
     {
-        add_options_page(
+        add_menu_page(
             __('AI Translation SEO', 'ai-translation-seo'),
             __('AI Translation SEO', 'ai-translation-seo'),
             Plugin::CAP_MANAGE_SETTINGS,
             self::PAGE_SLUG,
-            [$this, 'render']
+            [$this, 'renderMainPanel'],
+            'dashicons-translation',
+            58
         );
+
+        $tabs = [
+            'general' => __('General', 'ai-translation-seo'),
+            'languages' => __('Languages', 'ai-translation-seo'),
+            'providers' => __('Providers', 'ai-translation-seo'),
+            'workflow' => __('Workflow', 'ai-translation-seo'),
+            'glossary' => __('Glossary', 'ai-translation-seo'),
+            'tm' => __('Translation Memory', 'ai-translation-seo'),
+            'jobs' => __('Jobs', 'ai-translation-seo'),
+            'seo' => __('SEO', 'ai-translation-seo'),
+            'logs' => __('Logs', 'ai-translation-seo'),
+            'billing' => __('Billing', 'ai-translation-seo'),
+        ];
+
+        foreach ($tabs as $tab => $label) {
+            add_submenu_page(
+                self::PAGE_SLUG,
+                $label,
+                $label,
+                Plugin::CAP_MANAGE_SETTINGS,
+                self::PAGE_SLUG . '-' . $tab,
+                function () use ($tab): void {
+                    $this->renderMainPanel($tab);
+                }
+            );
+        }
     }
 
     public function registerSettings(): void
@@ -67,20 +95,23 @@ final class Settings_Page
         add_settings_field('glossary_violations', __('glossary violations allowed', 'ai-translation-seo'), [$this, 'fieldWfViolations'], self::PAGE_SLUG . '_workflow', 'ait_workflow');
     }
 
-    public function render(): void
+    public function renderMainPanel(?string $forcedTab = null): void
     {
         if (! current_user_can(Plugin::CAP_MANAGE_SETTINGS)) {
             wp_die(esc_html__('You are not allowed to access this page.', 'ai-translation-seo'));
         }
 
-        $tab = isset($_GET['tab']) ? sanitize_key((string) wp_unslash($_GET['tab'])) : 'general';
-        $allowed = ['general', 'languages', 'providers', 'workflow', 'glossary', 'tm', 'jobs', 'seo', 'logs', 'billing'];
-        if (! in_array($tab, $allowed, true)) {
-            $tab = 'general';
-        }
+        $tab = $forcedTab ?? $this->resolveTabFromRequest();
 
-        echo '<div class="wrap"><h1>' . esc_html__('AI Translation SEO', 'ai-translation-seo') . '</h1>';
+        echo '<div class="wrap"><h1>' . esc_html__('AI Translation SEO — Control Panel', 'ai-translation-seo') . '</h1>';
         $this->renderTabs($tab);
+
+        if ($tab === 'dashboard') {
+            $this->renderDashboard();
+            echo '</div>';
+
+            return;
+        }
 
         echo '<form method="post" action="options.php">';
         settings_fields(self::OPTION_GROUP);
@@ -92,16 +123,32 @@ final class Settings_Page
         } elseif ($tab === 'workflow') {
             do_settings_sections(self::PAGE_SLUG . '_workflow');
         } else {
-            echo '<p>' . esc_html__('Mockup tab – implementation pending.', 'ai-translation-seo') . '</p>';
+            echo '<p>' . esc_html__('Module panel ready. Detailed implementation for this tab is pending.', 'ai-translation-seo') . '</p>';
+            $this->renderPlaceholderSpec($tab);
         }
 
         submit_button(__('Save changes', 'ai-translation-seo'));
         echo '</form></div>';
     }
 
+    private function resolveTabFromRequest(): string
+    {
+        $page = isset($_GET['page']) ? sanitize_key((string) wp_unslash($_GET['page'])) : self::PAGE_SLUG;
+        if (str_starts_with($page, self::PAGE_SLUG . '-')) {
+            $tab = substr($page, strlen(self::PAGE_SLUG) + 1);
+        } else {
+            $tab = isset($_GET['tab']) ? sanitize_key((string) wp_unslash($_GET['tab'])) : 'dashboard';
+        }
+
+        $allowed = ['dashboard', 'general', 'languages', 'providers', 'workflow', 'glossary', 'tm', 'jobs', 'seo', 'logs', 'billing'];
+
+        return in_array($tab, $allowed, true) ? $tab : 'dashboard';
+    }
+
     private function renderTabs(string $activeTab): void
     {
         $tabs = [
+            'dashboard' => 'Dashboard',
             'general' => 'General',
             'languages' => 'Languages',
             'providers' => 'Providers',
@@ -114,13 +161,54 @@ final class Settings_Page
             'billing' => 'Billing',
         ];
 
-        echo '<nav class="nav-tab-wrapper">';
+        echo '<nav class="nav-tab-wrapper" style="margin-bottom:16px">';
         foreach ($tabs as $tab => $label) {
             $class = $activeTab === $tab ? ' nav-tab-active' : '';
-            $url = add_query_arg(['page' => self::PAGE_SLUG, 'tab' => $tab], admin_url('options-general.php'));
+            $url = $tab === 'dashboard'
+                ? admin_url('admin.php?page=' . self::PAGE_SLUG)
+                : admin_url('admin.php?page=' . self::PAGE_SLUG . '-' . $tab);
             echo '<a href="' . esc_url($url) . '" class="nav-tab' . esc_attr($class) . '">' . esc_html($label) . '</a>';
         }
         echo '</nav>';
+    }
+
+    private function renderDashboard(): void
+    {
+        echo '<div style="display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:12px;max-width:1100px">';
+        $cards = [
+            __('General setup', 'ai-translation-seo') => __('Language defaults, URL strategy, consent, uninstall policy.', 'ai-translation-seo'),
+            __('Providers', 'ai-translation-seo') => __('Provider selection, credentials, rate limits, batch mode.', 'ai-translation-seo'),
+            __('Workflow', 'ai-translation-seo') => __('Automation flags and QA thresholds.', 'ai-translation-seo'),
+            __('Glossary & TM', 'ai-translation-seo') => __('Term base and translation memory module.', 'ai-translation-seo'),
+            __('Jobs', 'ai-translation-seo') => __('Batch queue, statuses and retries.', 'ai-translation-seo'),
+            __('SEO, Logs, Billing', 'ai-translation-seo') => __('Metadata quality, audit trail and usage costs.', 'ai-translation-seo'),
+        ];
+
+        foreach ($cards as $title => $description) {
+            echo '<div style="background:#fff;border:1px solid #ccd0d4;padding:14px">';
+            echo '<h2 style="margin:0 0 8px 0;font-size:16px">' . esc_html($title) . '</h2>';
+            echo '<p style="margin:0">' . esc_html($description) . '</p>';
+            echo '</div>';
+        }
+
+        echo '</div>';
+    }
+
+    private function renderPlaceholderSpec(string $tab): void
+    {
+        $copy = [
+            'languages' => __('Expected: source/target locale matrix and language-level routing.', 'ai-translation-seo'),
+            'glossary' => __('Expected: term base CRUD and consistency validation.', 'ai-translation-seo'),
+            'tm' => __('Expected: translation memory segment import/export and match score.', 'ai-translation-seo'),
+            'jobs' => __('Expected: queue monitor, batch trigger and status transitions.', 'ai-translation-seo'),
+            'seo' => __('Expected: per-language SEO templates and metadata checks.', 'ai-translation-seo'),
+            'logs' => __('Expected: audit log with capability-gated read access.', 'ai-translation-seo'),
+            'billing' => __('Expected: provider cost tracking and consumption limits.', 'ai-translation-seo'),
+        ];
+
+        if (isset($copy[$tab])) {
+            echo '<p class="description">' . esc_html($copy[$tab]) . '</p>';
+        }
     }
 
     public function fieldSourceLanguage(): void
@@ -280,9 +368,7 @@ final class Settings_Page
 
     public function sanitizeScore(mixed $value): int
     {
-        $score = max(0, min(100, (int) $value));
-
-        return $score;
+        return max(0, min(100, (int) $value));
     }
 
     public function sanitizeViolationsAllowed(mixed $value): int

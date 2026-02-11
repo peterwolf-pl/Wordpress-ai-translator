@@ -14,6 +14,10 @@
 
 ---
 
+## Main menu placement
+- Top-level WP Admin menu: **AI Translation SEO** (complete control panel).
+- Submenu modules: Dashboard, General, Languages, Providers, Workflow, Glossary, Translation Memory, Jobs, SEO, Logs, Billing.
+
 ## General
 - Default source language: `pl-PL` (readonly)
 - Default target language: `[en-GB|en-US|en]` *(nieokreślone)*

@@ -11,6 +11,7 @@ final class Activator
         self::installSchema();
         self::setDefaultOptions();
         self::scheduleCron();
+        Capabilities_Manager::addCaps();
     }
 
     private static function installSchema(): void
@@ -46,16 +47,28 @@ final class Activator
 
     private static function setDefaultOptions(): void
     {
-        if (get_option(Plugin::OPTION_HARD_DELETE, null) === null) {
-            add_option(Plugin::OPTION_HARD_DELETE, '0');
-        }
+        $defaults = [
+            Plugin::OPTION_HARD_DELETE => '0',
+            Plugin::OPTION_CONSENT_EXTERNAL_AI => '0',
+            Plugin::OPTION_CONSENT_EXTERNAL_AI_AT => '',
+            Plugin::OPTION_DEFAULT_TARGET_LANGUAGE => 'en', // en-GB|en-US|en (nieokreślone)
+            Plugin::OPTION_URL_STRATEGY => 'subdir', // subdir|subdomain|domain (nieokreślone)
+            Plugin::OPTION_EN_URL_MODE => Plugin::EN_MODE_SUBDIRECTORY,
+            Plugin::OPTION_EN_SUBDIRECTORY => 'en',
+            Plugin::OPTION_PROVIDER => 'OpenAI',
+            Plugin::OPTION_PROVIDER_RATE_LIMIT_MODE => 'balanced',
+            Plugin::OPTION_PROVIDER_BATCH_MODE => '0',
+            Plugin::OPTION_WORKFLOW_AUTO_TRANSLATE_ON_PUBLISH => '0',
+            Plugin::OPTION_WORKFLOW_TRANSLATE_ON_UPDATE => '0',
+            Plugin::OPTION_WORKFLOW_ALWAYS_DRAFT => '1',
+            Plugin::OPTION_WORKFLOW_SCORE_MIN => 80,
+            Plugin::OPTION_WORKFLOW_GLOSSARY_VIOLATIONS_ALLOWED => 0,
+        ];
 
-        if (get_option(Plugin::OPTION_EN_URL_MODE, null) === null) {
-            add_option(Plugin::OPTION_EN_URL_MODE, Plugin::EN_MODE_SUBDIRECTORY);
-        }
-
-        if (get_option(Plugin::OPTION_EN_SUBDIRECTORY, null) === null) {
-            add_option(Plugin::OPTION_EN_SUBDIRECTORY, 'en');
+        foreach ($defaults as $key => $value) {
+            if (get_option($key, null) === null) {
+                add_option($key, $value);
+            }
         }
     }
 

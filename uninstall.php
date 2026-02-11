@@ -9,59 +9,54 @@ if (! defined('WP_UNINSTALL_PLUGIN')) {
     exit;
 }
 
-$optionSchemaVersion = 'ai_translation_seo_schema_version';
-$optionHardDelete = 'ai_translation_seo_hard_delete';
-$optionEnUrlMode = 'ai_translation_seo_en_url_mode';
-$optionEnSubdirectory = 'ai_translation_seo_en_subdirectory';
+$options = [
+    'ai_translation_seo_schema_version',
+    'ai_translation_seo_hard_delete',
+    'ai_translation_seo_consent_external_ai',
+    'ai_translation_seo_consent_external_ai_at',
+    'ai_translation_seo_default_target_language',
+    'ai_translation_seo_url_strategy',
+    'ai_translation_seo_en_url_mode',
+    'ai_translation_seo_en_subdirectory',
+    'ai_translation_seo_provider',
+    'ai_translation_seo_provider_rate_limit_mode',
+    'ai_translation_seo_provider_batch_mode',
+    'ai_translation_seo_wf_auto_on_publish',
+    'ai_translation_seo_wf_translate_on_update',
+    'ai_translation_seo_wf_always_draft',
+    'ai_translation_seo_wf_score_min',
+    'ai_translation_seo_wf_glossary_violations_allowed',
+];
+
 $tableSlug = 'ai_translation_seo_jobs';
+$hardDelete = get_option('ai_translation_seo_hard_delete', '0') === '1';
 
-$hardDelete = get_option($optionHardDelete, '0') === '1';
-
-$deleteOptions = static function () use (
-    $optionSchemaVersion,
-    $optionHardDelete,
-    $optionEnUrlMode,
-    $optionEnSubdirectory
-): void {
-    delete_option($optionSchemaVersion);
-    delete_option($optionHardDelete);
-    delete_option($optionEnUrlMode);
-    delete_option($optionEnSubdirectory);
-};
-
-if (is_multisite()) {
-    $siteIds = get_sites([
-        'fields' => 'ids',
-        'number' => 0,
-    ]);
-
-    foreach ($siteIds as $siteId) {
-        switch_to_blog((int) $siteId);
-        $deleteOptions();
-
-        if ($hardDelete) {
-            global $wpdb;
-            $tableName = $wpdb->prefix . $tableSlug;
-            // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- table name is controlled internally.
-            $wpdb->query("DROP TABLE IF EXISTS {$tableName}");
-        }
+$cleanupCurrentSite = static function () use ($options, $hardDelete, $tableSlug): void {
+    foreach ($options as $option) {
+        delete_option($option);
     }
-
-    restore_current_blog();
-} else {
-    $deleteOptions();
 
     if ($hardDelete) {
         global $wpdb;
         $tableName = $wpdb->prefix . $tableSlug;
-
-        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- table name is controlled internally.
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- table name is internally controlled.
         $wpdb->query("DROP TABLE IF EXISTS {$tableName}");
     }
+};
+
+if (is_multisite()) {
+    $siteIds = get_sites(['fields' => 'ids', 'number' => 0]);
+
+    foreach ($siteIds as $siteId) {
+        switch_to_blog((int) $siteId);
+        $cleanupCurrentSite();
+    }
+
+    restore_current_blog();
+} else {
+    $cleanupCurrentSite();
 }
 
-// Porządek także na poziomie sieci (network options).
-delete_site_option($optionSchemaVersion);
-delete_site_option($optionHardDelete);
-delete_site_option($optionEnUrlMode);
-delete_site_option($optionEnSubdirectory);
+foreach ($options as $option) {
+    delete_site_option($option);
+}

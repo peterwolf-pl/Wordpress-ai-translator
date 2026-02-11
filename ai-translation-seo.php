@@ -3,7 +3,7 @@
  * Plugin Name: WP-ai-translation-seo
  * Plugin URI:  https://example.com/wp-ai-translation-seo
  * Description: AI translation helper with SEO-oriented storage and scheduling.
- * Version:     1.0.1
+ * Version:     1.1.0
  * Author:      WP AI Translation Team
  * Text Domain: ai-translation-seo
  * Domain Path: /languages
@@ -19,7 +19,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-const AI_TRANSLATION_SEO_VERSION = '1.0.1';
+const AI_TRANSLATION_SEO_VERSION = '1.1.0';
 const AI_TRANSLATION_SEO_FILE = __FILE__;
 
 /**
